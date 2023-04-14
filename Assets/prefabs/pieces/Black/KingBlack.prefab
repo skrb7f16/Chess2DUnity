@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1286043413188250795}
   - component: {fileID: 1910992048564752972}
+  - component: {fileID: -697244403169859917}
   m_Layer: 0
   m_Name: KingBlack
   m_TagString: Untagged
@@ -84,3 +85,17 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &-697244403169859917
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1401800769195022368}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5529fee124d2ed645a361fc179c2c0cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  color: 0
+  typeOfCharacter: 3

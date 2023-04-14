@@ -4,16 +4,35 @@ using UnityEngine;
 
 public class Character : MonoBehaviour
 {
-    // Start is called before the first frame update
-    [SerializeField] public string nameOfCharacter;
+    
+    
+    [SerializeField] public byte color;
+
+    public enum TypeOfCharacter
+    {
+        Knight,
+        Elephant,
+        Pawn,
+        King,
+        Queen,
+        Bishop
+    }
+
+    [SerializeField]  TypeOfCharacter typeOfCharacter;
+    
     void Start()
     {
         
     }
 
-    // Update is called once per frame
+    
     void Update()
     {
         
+    }
+
+    public TypeOfCharacter GetTypeOfCharacter()
+    {
+        return typeOfCharacter;
     }
 }
