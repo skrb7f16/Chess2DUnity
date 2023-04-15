@@ -9,8 +9,9 @@ public class Position : MonoBehaviour
     private bool hasPiece;
     private Character character;
     private bool canBeNextMove;
+    private bool enemyToBeKilled;
     public Color colorOfPiece;
-    Material defaultMaterial;
+    
     void Start()
     {
         colorOfPiece = GetComponent<SpriteRenderer>().color;
@@ -28,6 +29,15 @@ public class Position : MonoBehaviour
         {
 
         }
+    }
+
+    public void SetEnemyToBeKilled(bool b)
+    {
+        enemyToBeKilled = b;
+    }
+    public bool GetEnemyToBeKilled()
+    {
+        return enemyToBeKilled;
     }
     public void SetPosition(int r, int c)
     {
@@ -56,6 +66,10 @@ public class Position : MonoBehaviour
         character = c;
     }
 
+    public Character GetCharacter()
+    {
+        return character;
+    }
     public void SetCanBeNextMove(bool b)
     {
         canBeNextMove = b;
@@ -98,6 +112,10 @@ public class Position : MonoBehaviour
             case Character.TypeOfCharacter.King:
                 HandleKingMovement();
                 break;
+
+            case Character.TypeOfCharacter.Knight:
+                HandleKnightMovement();
+                break;
             default:
                 print("hello");
                 break;
@@ -115,32 +133,31 @@ public class Position : MonoBehaviour
 
     public void HandleKingMovement()
     {
-        int[,] temp = Moves.GetKingMove(row, col);
-        for (int i = 0; i < 8; i++)
-        {
-            print(temp[i, 0]);
-            print(temp[i, 1]);
-            temp[i, 0] += row;
-            temp[i, 1] += col;
-            if(temp[i,1]<8 && temp[i,1]>=0 && temp[i,0]<8 && temp[i, 0] >= 0)
-            {
-                Position pos = Board.instance.GetPositionForNextMove(temp[i, 0], temp[i, 1]);
-                if(!pos.HasPiece() || pos.character.color!=character.color)
-                Board.instance.positionsToMove.Add(pos);
-            }
-            
-        }
+        Moves.GetKingMove(row, col,character.color);
+        
         MarkNextMoves();
     }
 
-
+    public void HandleKnightMovement()
+    {
+        Moves.GetKnightMove(row,col,character.color);
+        MarkNextMoves();
+    }
 
     public void MarkNextMoves()
     {
         foreach (Position t in Board.instance.positionsToMove)
         {
             t.SetCanBeNextMove(true);
-            t.GetComponent<SpriteRenderer>().color = Color.yellow;
+            if (!t.GetEnemyToBeKilled())
+            {
+                t.GetComponent<SpriteRenderer>().color = Color.yellow;
+            }
+            else
+            {
+                t.GetComponent<SpriteRenderer>().color = Color.red;
+            }
+            
         }
     }
     public void UnMarkNextMoves()
