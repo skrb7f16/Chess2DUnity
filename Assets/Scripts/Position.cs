@@ -116,6 +116,16 @@ public class Position : MonoBehaviour
             case Character.TypeOfCharacter.Knight:
                 HandleKnightMovement();
                 break;
+            case Character.TypeOfCharacter.Elephant:
+                HandleElephantMovement();
+                break;
+            case Character.TypeOfCharacter.Bishop:
+                HandleBishopMovement();
+                break;
+            case Character.TypeOfCharacter.Queen:
+                HandleQueenMovement();
+                break;
+
             default:
                 print("hello");
                 break;
@@ -141,6 +151,25 @@ public class Position : MonoBehaviour
     public void HandleKnightMovement()
     {
         Moves.GetKnightMove(row,col,character.color);
+        MarkNextMoves();
+    }
+
+    public void HandleElephantMovement()
+    {
+        Moves.GetElephantMove(row,col,character.color);
+        MarkNextMoves();
+    }
+
+
+    public void HandleBishopMovement()
+    {
+        Moves.GetBishopMove(row,col,character.color);
+        MarkNextMoves();
+    }
+
+    public void HandleQueenMovement()
+    {
+        Moves.GetQueenMove(row, col, character.color);
         MarkNextMoves();
     }
 

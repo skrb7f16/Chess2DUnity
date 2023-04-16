@@ -63,6 +63,7 @@ public class Board : MonoBehaviour
 
     public Position GetPositionForNextMove(int r,int c)
     {
+        
         if (r < 8 && c < 8)
         {
             return board[r][c].GetComponent<Position>();
