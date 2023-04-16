@@ -14,19 +14,70 @@ public class Moves
     //north,south,west,east,northwest,northeast,southwest,southeast
     public static int[] MoveDirAllowed = { 1, 1, 1, 1,1,1,1,1 };
 
-    public static int[] GetPawnMove(int r,int c,int color)
+
+
+    // pawn movement and enemy detection
+    public static void GetPawnMove(int r,int c,int color)
     {
+        
+        int[] arr;
         if (color == COLOR_BLACK)
         {
-            return new int[] { r+blackPawn[0],c+blackPawn[1]};
+           
+             arr= new int[] { r+blackPawn[0],c+blackPawn[1]};
+            
         }
         else
         {
-            return new int[] { r + whitePawn[0], c + whitePawn[1] };
+             arr= new int[] { r + whitePawn[0], c + whitePawn[1] };
+            
+        }
+        Position temp = Board.instance.GetPositionForNextMove(arr[0], arr[1]);
+        if (temp.HasPiece() == false)
+            Board.instance.positionsToMove.Add(temp);
+        CheckForEnemyForPawn(arr, color);
+        if(r==6 && color == COLOR_BLACK)
+        {
+             temp = Board.instance.GetPositionForNextMove(arr[0]+blackPawn[0], arr[1]);
+            if (temp.HasPiece() == false)
+                Board.instance.positionsToMove.Add(temp);
+        }
+        else if(r==1 && color == COLOR_WHITE)
+        {
+             temp = Board.instance.GetPositionForNextMove(arr[0]+whitePawn[0], arr[1]);
+            if (temp.HasPiece() == false)
+                Board.instance.positionsToMove.Add(temp);
+        }
+    }
+
+    public static void CheckForEnemyForPawn(int[] arr,int color)
+    {
+        if (arr[1] >= 1)
+        {
+            Position enemy = Board.instance.GetPositionForNextMove(arr[0], arr[1] - 1);
+            if (enemy.HasPiece() && enemy.GetCharacter().color != color)
+            {
+               
+                enemy.SetEnemyToBeKilled(true);
+                Board.instance.positionsToMove.Add(enemy);
+            }
+        }
+        if (arr[1] < 7)
+        {
+            Position enemy = Board.instance.GetPositionForNextMove(arr[0], arr[1] + 1);
+            if (enemy.HasPiece() && enemy.GetCharacter().color != color)
+            {
+                ;
+                enemy.SetEnemyToBeKilled(true);
+                Board.instance.positionsToMove.Add(enemy);
+            }
         }
     }
 
 
+
+
+    // King Movement
     public static void GetKingMove(int r,int c,int color)
     {
         int[,] temp = (int[,])KingMovement.Clone();
@@ -35,19 +86,9 @@ public class Moves
 
             temp[i, 0] += r;
             temp[i, 1] += c;
-            if (temp[i, 1] < 8 && temp[i, 1] >= 0 && temp[i, 0] < 8 && temp[i, 0] >= 0)
-            {
-                Position pos = Board.instance.GetPositionForNextMove(temp[i, 0], temp[i, 1]);
-                if (!pos.HasPiece())
-                {
-                    Board.instance.positionsToMove.Add(pos);
-                }
-                else if (pos.GetCharacter().color != color)
-                {
-                    pos.SetEnemyToBeKilled(true);
-                    Board.instance.positionsToMove.Add(pos);
-                }
-            }
+            int[] arr = { temp[i, 0], temp[i, 1] };
+            CheckAndAddForNextMove(arr, color, -1);
+            
 
         }
 
@@ -55,6 +96,7 @@ public class Moves
 
     }
 
+    // Knight Movement
     public static void GetKnightMove(int r,int c,int color)
     {
         int[,] temp = (int[,])KnightMovement.Clone();
@@ -63,25 +105,16 @@ public class Moves
 
             temp[i, 0] += r;
             temp[i, 1] += c;
-            if (temp[i, 1] < 8 && temp[i, 1] >= 0 && temp[i, 0] < 8 && temp[i, 0] >= 0)
-            {
-                Position pos = Board.instance.GetPositionForNextMove(temp[i, 0], temp[i, 1]);
-                if (!pos.HasPiece())
-                {
-                    Board.instance.positionsToMove.Add(pos);
-                }else if(pos.GetCharacter().color != color)
-                {
-                    pos.SetEnemyToBeKilled(true);
-                    Board.instance.positionsToMove.Add(pos);
-                }
-                    
-            }
+            int[] arr = { temp[i, 0], temp[i, 1] };
+            CheckAndAddForNextMove(arr, color, -1);
+            
 
         }
 
     }
 
 
+    // Elephant Movement
     public static void GetElephantMove(int r,int c,int color)
     {
         MoveDirAllowed[4] = 0;
@@ -109,6 +142,7 @@ public class Moves
     }
 
 
+    //BishopMovement
     public static void GetBishopMove(int r,int c,int color)
     {
         MoveDirAllowed[0] = 0;
@@ -136,6 +170,8 @@ public class Moves
         for (int i = 0; i < 8; i++) MoveDirAllowed[i] = 1;
     }
 
+
+    //Queen movement is combination of bishop and elephant
     public static void GetQueenMove(int r,int c,int color)
     {
         GetElephantMove(r, c, color);
@@ -143,6 +179,8 @@ public class Moves
     }
 
 
+
+    //this function is called to check for enemy and check if the character doesnt go out of bounds and thn add it to next moves list
     public static void CheckAndAddForNextMove(int[] temp,int color,int indexOfDir)
     {
         
@@ -159,11 +197,13 @@ public class Moves
             {
                 pos.SetEnemyToBeKilled(true);
                 Board.instance.positionsToMove.Add(pos);
+                if(indexOfDir>=0 && indexOfDir<8)
                 MoveDirAllowed[indexOfDir] = 0;
             }
             else
             {
-                MoveDirAllowed[indexOfDir] = 0;
+                if (indexOfDir >= 0 && indexOfDir < 8)
+                    MoveDirAllowed[indexOfDir] = 0;
             }
 
         }

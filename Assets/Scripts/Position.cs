@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-public class Position : MonoBehaviour
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
+public class Position : MonoBehaviour,IPointerDownHandler
 {
     private int row;
     private int col;
@@ -11,6 +12,8 @@ public class Position : MonoBehaviour
     private bool canBeNextMove;
     private bool enemyToBeKilled;
     public Color colorOfPiece;
+    
+
     
     void Start()
     {
@@ -79,25 +82,61 @@ public class Position : MonoBehaviour
         return canBeNextMove;
     }
 
-    private void OnMouseDown()
+    public void OnPointerDown(PointerEventData eventData)
     {
-        
         if (Board.instance.selectPieceMode)
         {
-            HandleSelectingPiece();
-        }else if (Board.instance.pieceSelectedMode)
+            if (HasPiece() && character.color == Board.instance.chance)
+                HandleSelectingPiece();
+        }
+        else if (Board.instance.pieceSelectedMode)
         {
             if (canBeNextMove)
             {
                 MovePiece();
             }
+            else
+            {
+                Board.instance.selectPieceMode = true;
+                Board.instance.pieceSelectedMode = false;
+                Board.instance.selectedPosition = null;
+                Board.instance.selectedCharacter = null;
+                UnMarkNextMoves();
+            }
         }
-        
+    }
+
+
+    private void OnMouseDown()
+    {
+        if (Board.instance.selectPieceMode)
+        {
+            if (HasPiece() && character.color == Board.instance.chance)
+                HandleSelectingPiece();
+        }
+        else if (Board.instance.pieceSelectedMode)
+        {
+            if (canBeNextMove)
+            {
+                MovePiece();
+            }
+            else
+            {
+                Board.instance.selectPieceMode = true;
+                Board.instance.pieceSelectedMode = false;
+                Board.instance.selectedPosition = null;
+                Board.instance.selectedCharacter = null;
+                UnMarkNextMoves();
+            }
+        }
+
+
     }
 
 
     public void HandleSelectingPiece()
     {
+        
         Board.instance.selectPieceMode = false;
         Board.instance.pieceSelectedMode = true;
         Board.instance.selectedPosition = this;
@@ -127,19 +166,23 @@ public class Position : MonoBehaviour
                 break;
 
             default:
-                print("hello");
+                print("Please click on the character");
+                
                 break;
         }
     }
 
     public void HandlePawnClicked()
     {
-        int[] arr = Moves.GetPawnMove(row, col, character.color);
-        Position temp = Board.instance.GetPositionForNextMove(arr[0], arr[1]);
-        Board.instance.positionsToMove.Add(temp);
+        Moves.GetPawnMove(row, col, character.color);
+        
         MarkNextMoves();
+
+
     }
 
+
+    
 
     public void HandleKingMovement()
     {
@@ -202,6 +245,8 @@ public class Position : MonoBehaviour
     {
         Board.instance.selectedCharacter.transform.parent = transform;
         Board.instance.selectedCharacter.transform.localPosition = Vector2.zero;
+        if(character!=null)
+        Destroy(character.gameObject);
         character = Board.instance.selectedPosition.character;
         SetHasPiece(true);
         Board.instance.selectedPosition.character = null;
@@ -212,8 +257,10 @@ public class Position : MonoBehaviour
         Board.instance.pieceSelectedMode = false;
         Board.instance.selectedPosition = null;
         Board.instance.selectedCharacter = null;
-        
-
+        Board.instance.chance = (Board.instance.chance + 1) % 2;
+        Board.instance.SetIndicators();
 
     }
+
+    
 }
