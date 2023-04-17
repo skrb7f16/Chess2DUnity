@@ -18,3 +18,5 @@
 # Visual Studio cache directory
 .vs/
 [Aa]ssets/TextMesh*Pro/
+
+/keystore

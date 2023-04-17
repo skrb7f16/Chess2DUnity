@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.SceneManagement;
 public class Board : MonoBehaviour
 {
     public static Board instance;
@@ -14,6 +14,8 @@ public class Board : MonoBehaviour
     public bool selectPieceMode;
     public bool pieceSelectedMode;
     [SerializeField] private GameObject[] indicators;
+    [SerializeField] private Character[] Kings;
+
 
     void Start()
     {
@@ -86,9 +88,20 @@ public class Board : MonoBehaviour
     }
 
 
-    public void CalculateNextMove()
+    public void CheckForCheck(Character c,int color)
+    {
+        if (c.GetTypeOfCharacter() == Character.TypeOfCharacter.Pawn)
+        {
+
+        }
+    }
+
+
+    public void ResetBoard()
     {
 
+        SceneManager.LoadScene(1);
     }
+
 
 }

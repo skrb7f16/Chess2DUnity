@@ -237,6 +237,7 @@ public class Position : MonoBehaviour,IPointerDownHandler
         foreach (Position t in Board.instance.positionsToMove)
         {
             t.SetCanBeNextMove(false);
+            t.SetEnemyToBeKilled(false);
             t.GetComponent<SpriteRenderer>().color = t.colorOfPiece;
         }
     }
@@ -245,8 +246,14 @@ public class Position : MonoBehaviour,IPointerDownHandler
     {
         Board.instance.selectedCharacter.transform.parent = transform;
         Board.instance.selectedCharacter.transform.localPosition = Vector2.zero;
-        if(character!=null)
-        Destroy(character.gameObject);
+        if (character != null)
+        {
+            if (character.GetTypeOfCharacter() == Character.TypeOfCharacter.King)
+            {
+                Board.instance.ResetBoard();
+            }
+            Destroy(character.gameObject);
+        }
         character = Board.instance.selectedPosition.character;
         SetHasPiece(true);
         Board.instance.selectedPosition.character = null;
