@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
-public class Position : MonoBehaviour,IPointerDownHandler
+using Unity.Netcode;
+public class Position :NetworkBehaviour ,IPointerDownHandler
 {
     private int row;
     private int col;
@@ -86,7 +87,7 @@ public class Position : MonoBehaviour,IPointerDownHandler
     {
         if (Board.instance.selectPieceMode)
         {
-            if (HasPiece() && character.color == Board.instance.chance)
+            if (HasPiece() && character.color == Board.instance.chance && Board.instance.chance==(int)NetworkManager.Singleton.LocalClientId)
                 HandleSelectingPiece();
         }
         else if (Board.instance.pieceSelectedMode)
@@ -111,7 +112,7 @@ public class Position : MonoBehaviour,IPointerDownHandler
     {
         if (Board.instance.selectPieceMode)
         {
-            if (HasPiece() && character.color == Board.instance.chance)
+            if (HasPiece() && character.color == Board.instance.chance && Board.instance.chance == (int)NetworkManager.Singleton.LocalClientId)
                 HandleSelectingPiece();
         }
         else if (Board.instance.pieceSelectedMode)
@@ -244,6 +245,12 @@ public class Position : MonoBehaviour,IPointerDownHandler
 
     public void MovePiece()
     {
+        UnMarkNextMoves();
+        Board.instance.selectPieceMode = true;
+        Board.instance.pieceSelectedMode = false;
+
+        Board.instance.HandleClickCharacterServerRPC(row, col, Board.instance.selectedPosition.row, Board.instance.selectedPosition.col);
+        /*
         Board.instance.selectedCharacter.transform.parent = transform;
         Board.instance.selectedCharacter.transform.localPosition = Vector2.zero;
         if (character != null)
@@ -266,7 +273,7 @@ public class Position : MonoBehaviour,IPointerDownHandler
         Board.instance.selectedCharacter = null;
         Board.instance.chance = (Board.instance.chance + 1) % 2;
         Board.instance.SetIndicators();
-
+        */
     }
 
     

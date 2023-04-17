@@ -2,7 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-public class Board : MonoBehaviour
+using Unity.Netcode;
+public class Board : NetworkBehaviour
 {
     public static Board instance;
 
@@ -88,13 +89,7 @@ public class Board : MonoBehaviour
     }
 
 
-    public void CheckForCheck(Character c,int color)
-    {
-        if (c.GetTypeOfCharacter() == Character.TypeOfCharacter.Pawn)
-        {
-
-        }
-    }
+   
 
 
     public void ResetBoard()
@@ -103,5 +98,53 @@ public class Board : MonoBehaviour
         SceneManager.LoadScene(1);
     }
 
+
+    [ServerRpc(RequireOwnership = false)]
+    public void HandleClickCharacterServerRPC(int newi, int newj, int oldi, int oldj)
+    {
+
+        HandleClickCharacterClientRPC(newi, newj, oldi, oldj);
+    }
+
+
+    [ClientRpc]
+    public void HandleClickCharacterClientRPC(int newi, int newj, int oldi, int oldj)
+    {
+        print("HELLO");
+        Position pnew = GetPositionForNextMove(newi, newj);
+        Position pold = GetPositionForNextMove(oldi, oldj);
+        Character characterMoved = pold.GetCharacter();
+        Character characterAlreadyAtNewPosition = pnew.GetCharacter();
+
+        characterMoved.gameObject.transform.parent = pnew.transform;
+        characterMoved.transform.localPosition = Vector2.zero;
+        if (characterAlreadyAtNewPosition != null)
+        {
+            Destroy(characterAlreadyAtNewPosition.gameObject);
+        }
+
+        pnew.SetHasPiece(true);
+        pold.SetHasPiece(false);
+
+        pold.SetCharacter(null);
+        pnew.SetCharacter(characterMoved);
+
+        chance = (chance + 1) % 2;
+        SetIndicators();
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void HandleMessageSentServerRPC(string msg, int id)
+    {
+
+        HandleMessageRecievedClientRPC(msg, id);
+
+    }
+
+    [ClientRpc]
+    public void HandleMessageRecievedClientRPC(string msg, int id)
+    {
+        UIManager.instance.ShowMessage(msg, id);
+    }
 
 }
